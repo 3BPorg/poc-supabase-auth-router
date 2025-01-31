@@ -1,30 +1,10 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client.tsx";
+import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/auth/otp-callback")({
   component: RouteComponent,
 });
 
 function RouteComponent() {
-  const navigate = useNavigate();
-  useEffect(() => {
-    const handleAuthCallback = async () => {
-      const { error, data } = await supabase.auth.getSession();
-
-      console.log("Auth callback data:", data);
-
-      if (error) {
-        console.error("Error during auth callback:", error.message);
-        await navigate({ to: "/auth" });
-      } else {
-        await navigate({ to: "/" });
-      }
-    };
-
-    void handleAuthCallback();
-  }, [navigate]);
-
   return (
     <div className="auth-callback">
       <p>Processing authentication...</p>

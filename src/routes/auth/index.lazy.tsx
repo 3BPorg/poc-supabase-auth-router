@@ -1,4 +1,4 @@
-import { createLazyFileRoute } from "@tanstack/react-router";
+import { createLazyFileRoute, useLocation } from "@tanstack/react-router";
 import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button.tsx";
 import { Card, CardContent, CardHeader } from "@/components/ui/card.tsx";
@@ -19,14 +19,15 @@ function RouteComponent() {
     text: string;
   } | null>(null);
 
+  const location = useLocation();
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       setLoading(true);
       setMessage(null);
 
-      const url = `${window.location.origin}/auth/otp-callback`;
-      console.log("url", url);
+      const url = `${window.location.origin}/auth/otp-callback${location.searchStr}`;
 
       const { error } = await supabase.auth.signInWithOtp({
         email,
