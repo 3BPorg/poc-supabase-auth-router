@@ -10,6 +10,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@radix-ui/react-slot": "^1.1.1",
+    "@supabase/supabase-js": "^2.48.1",
     "@tailwindcss/vite": "^4.0.1",
     "@tanstack/react-router": "^1.98.4",
     "class-variance-authority": "^0.7.1",
