@@ -1,35 +1,30 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { createRouter, RouterProvider } from "@tanstack/react-router";
+import { routeTree } from "@/routeTree.gen.ts";
+import { useAuthContext } from "@/components/providers/auth/useAuthContext.ts";
+import { useEffect } from "react";
 
-function App() {
-  const [count, setCount] = useState(0)
+const router = createRouter({
+  routeTree,
+  context: { auth: undefined! },
+});
 
-  return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+// Register the router instance for type safety
+declare module "@tanstack/react-router" {
+  interface Register {
+    router: typeof router;
+  }
 }
 
-export default App
+export const App = () => {
+  const auth = useAuthContext();
+
+  console.log("auth changed", auth);
+
+  useEffect(() => {
+    console.log("invalidating router");
+
+    router.invalidate();
+  }, [auth.isAuthenticated]);
+
+  return <RouterProvider router={router} context={{ auth }} />;
+};

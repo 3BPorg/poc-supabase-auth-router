@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Session } from "@supabase/supabase-js";
 import { AuthContext } from "./AuthContext.tsx";
@@ -20,9 +20,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     setIsAuthenticated(!!session);
   };
 
-  const logout = async () => {
+  const logout = useCallback(async () => {
     await supabase.auth.signOut();
-  };
+  }, []);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -36,9 +36,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     });
   }, []);
 
-  return (
-    <AuthContext.Provider value={{ user, isAuthenticated, logout }}>
-      {children}
-    </AuthContext.Provider>
+  const auth = useMemo(
+    () => ({ user, isAuthenticated, logout }),
+    [isAuthenticated, user, logout],
   );
+
+  return <AuthContext.Provider value={auth}>{children}</AuthContext.Provider>;
 };
