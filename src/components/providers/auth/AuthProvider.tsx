@@ -5,20 +5,24 @@ import { AuthContext } from "./AuthContext.tsx";
 import { AuthenticatedUser } from "./types";
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+  const [isAnonymous, setIsAnonymous] = useState(false);
   const [user, setUser] = useState<AuthenticatedUser | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  const setUserState = (session: Session | null) => {
+  const setUserState = useCallback((session: Session | null) => {
     setUser(
       session && {
         id: session.user.id,
         email: session.user.email,
         displayName: session.user.email || "Anonymous",
-        isAnonymous: session.user.is_anonymous || false,
       },
     );
-    setIsAuthenticated(!!session);
-  };
+
+    const _isAuthenticated = !!session;
+
+    setIsAuthenticated(_isAuthenticated);
+    setIsAnonymous(_isAuthenticated && (session?.user.is_anonymous || false));
+  }, []);
 
   const logout = useCallback(async () => {
     await supabase.auth.signOut();
@@ -26,19 +30,22 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
-      console.log("Session on mount:", session);
       setUserState(session);
     });
 
     supabase.auth.onAuthStateChange((_event, session) => {
-      console.log("Session on auth state change:", session);
       setUserState(session);
     });
-  }, []);
+  }, [setUserState]);
 
   const auth = useMemo(
-    () => ({ user, isAuthenticated, logout }),
-    [isAuthenticated, user, logout],
+    () => ({
+      user,
+      isAuthenticated,
+      logout,
+      isAnonymous,
+    }),
+    [isAuthenticated, isAnonymous, user, logout],
   );
 
   return <AuthContext.Provider value={auth}>{children}</AuthContext.Provider>;

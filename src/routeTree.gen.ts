@@ -20,6 +20,7 @@ import { Route as AuthOtpCallbackImport } from './routes/auth/otp-callback'
 
 const AuthIndexLazyImport = createFileRoute('/auth/')()
 const AuthedIndexLazyImport = createFileRoute('/_authed/')()
+const AuthLinkAccountLazyImport = createFileRoute('/auth/link-account')()
 const AuthedAboutLazyImport = createFileRoute('/_authed/about')()
 
 // Create/Update Routes
@@ -40,6 +41,14 @@ const AuthedIndexLazyRoute = AuthedIndexLazyImport.update({
   path: '/',
   getParentRoute: () => AuthedRoute,
 } as any).lazy(() => import('./routes/_authed/index.lazy').then((d) => d.Route))
+
+const AuthLinkAccountLazyRoute = AuthLinkAccountLazyImport.update({
+  id: '/auth/link-account',
+  path: '/auth/link-account',
+  getParentRoute: () => rootRoute,
+} as any).lazy(() =>
+  import('./routes/auth/link-account.lazy').then((d) => d.Route),
+)
 
 const AuthedAboutLazyRoute = AuthedAboutLazyImport.update({
   id: '/about',
@@ -78,6 +87,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthedAboutLazyImport
       parentRoute: typeof AuthedImport
     }
+    '/auth/link-account': {
+      id: '/auth/link-account'
+      path: '/auth/link-account'
+      fullPath: '/auth/link-account'
+      preLoaderRoute: typeof AuthLinkAccountLazyImport
+      parentRoute: typeof rootRoute
+    }
     '/_authed/': {
       id: '/_authed/'
       path: '/'
@@ -114,6 +130,7 @@ export interface FileRoutesByFullPath {
   '': typeof AuthedRouteWithChildren
   '/auth/otp-callback': typeof AuthOtpCallbackRoute
   '/about': typeof AuthedAboutLazyRoute
+  '/auth/link-account': typeof AuthLinkAccountLazyRoute
   '/': typeof AuthedIndexLazyRoute
   '/auth': typeof AuthIndexLazyRoute
 }
@@ -121,6 +138,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/auth/otp-callback': typeof AuthOtpCallbackRoute
   '/about': typeof AuthedAboutLazyRoute
+  '/auth/link-account': typeof AuthLinkAccountLazyRoute
   '/': typeof AuthedIndexLazyRoute
   '/auth': typeof AuthIndexLazyRoute
 }
@@ -130,20 +148,28 @@ export interface FileRoutesById {
   '/_authed': typeof AuthedRouteWithChildren
   '/auth/otp-callback': typeof AuthOtpCallbackRoute
   '/_authed/about': typeof AuthedAboutLazyRoute
+  '/auth/link-account': typeof AuthLinkAccountLazyRoute
   '/_authed/': typeof AuthedIndexLazyRoute
   '/auth/': typeof AuthIndexLazyRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '' | '/auth/otp-callback' | '/about' | '/' | '/auth'
+  fullPaths:
+    | ''
+    | '/auth/otp-callback'
+    | '/about'
+    | '/auth/link-account'
+    | '/'
+    | '/auth'
   fileRoutesByTo: FileRoutesByTo
-  to: '/auth/otp-callback' | '/about' | '/' | '/auth'
+  to: '/auth/otp-callback' | '/about' | '/auth/link-account' | '/' | '/auth'
   id:
     | '__root__'
     | '/_authed'
     | '/auth/otp-callback'
     | '/_authed/about'
+    | '/auth/link-account'
     | '/_authed/'
     | '/auth/'
   fileRoutesById: FileRoutesById
@@ -152,12 +178,14 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   AuthedRoute: typeof AuthedRouteWithChildren
   AuthOtpCallbackRoute: typeof AuthOtpCallbackRoute
+  AuthLinkAccountLazyRoute: typeof AuthLinkAccountLazyRoute
   AuthIndexLazyRoute: typeof AuthIndexLazyRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   AuthedRoute: AuthedRouteWithChildren,
   AuthOtpCallbackRoute: AuthOtpCallbackRoute,
+  AuthLinkAccountLazyRoute: AuthLinkAccountLazyRoute,
   AuthIndexLazyRoute: AuthIndexLazyRoute,
 }
 
@@ -173,6 +201,7 @@ export const routeTree = rootRoute
       "children": [
         "/_authed",
         "/auth/otp-callback",
+        "/auth/link-account",
         "/auth/"
       ]
     },
@@ -189,6 +218,9 @@ export const routeTree = rootRoute
     "/_authed/about": {
       "filePath": "_authed/about.lazy.tsx",
       "parent": "/_authed"
+    },
+    "/auth/link-account": {
+      "filePath": "auth/link-account.lazy.tsx"
     },
     "/_authed/": {
       "filePath": "_authed/index.lazy.tsx",

@@ -30,9 +30,28 @@ const Header = () => {
   );
 };
 
+const AnonBanner = () => {
+  return (
+    <div className="bg-yellow-100 dark:bg-yellow-900 px-4 py-2 text-center text-sm">
+      <span className="text-yellow-800 dark:text-yellow-200">
+        You're using an anonymous account. Your data will be lost if you don't{" "}
+        <Link
+          to="/auth/link-account"
+          className="font-semibold underline hover:text-yellow-950 dark:hover:text-yellow-50"
+        >
+          create an account
+        </Link>
+      </span>
+    </div>
+  );
+};
+
 const RootComponent = () => {
+  const { isAnonymous } = useAuthContext();
+
   return (
     <>
+      {isAnonymous && <AnonBanner />}
       <Header />
       <hr />
       <Outlet />

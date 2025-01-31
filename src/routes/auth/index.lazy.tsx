@@ -52,7 +52,20 @@ function RouteComponent() {
     }
   };
 
-  const handleLoginAnonymously = (e: React.FormEvent) => {};
+  const handleLoginAnonymously = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      await supabase.auth.signInAnonymously();
+    } catch (error) {
+      setMessage({
+        type: "error",
+        text: error instanceof Error ? error.message : "An error occurred",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="container flex items-center justify-center min-h-screen p-4">
