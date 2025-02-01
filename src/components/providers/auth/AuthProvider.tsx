@@ -39,9 +39,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     void updateSessionOnStart();
 
-    supabase.auth.onAuthStateChange((_event, session) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
       setUserState(session);
     });
+
+    return () => {
+      subscription.unsubscribe();
+    };
   }, [setUserState]);
 
   const auth = useMemo(
