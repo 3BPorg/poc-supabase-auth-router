@@ -18,11 +18,7 @@ declare module "@tanstack/react-router" {
 export const App = () => {
   const auth = useAuthContext();
 
-  console.log("auth changed", auth);
-
   useEffect(() => {
-    console.log("invalidating router");
-
     router.invalidate();
   }, [auth.isAuthenticated]);
 

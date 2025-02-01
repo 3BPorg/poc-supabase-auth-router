@@ -10,7 +10,6 @@ import { RouterContext } from "@/types.ts";
 
 const Header = () => {
   const { isAuthenticated, logout } = useAuthContext();
-  console.log("isAuthenticated (header)", isAuthenticated);
   return (
     <div className="p-2 flex gap-2">
       {isAuthenticated && (
@@ -61,21 +60,22 @@ const RootComponent = () => {
 };
 
 export const Route = createRootRouteWithContext<RouterContext>()({
-  beforeLoad: async ({ context, location, params }) => {
-    const isAuthRoute = location.pathname.startsWith("/auth");
-    console.log("beforeLoad", context, location, params);
+  beforeLoad: async ({ context, location }) => {
+    const isAuthRoute =
+      location.pathname === "/auth" ||
+      location.pathname === "/auth/otp-callback";
     if (!context.auth.isAuthenticated && !isAuthRoute) {
       throw redirect({
         to: "/auth",
         search: {
-          redirect: location.href,
+          app_redirect: location.href,
         },
       });
     }
 
     if (context.auth.isAuthenticated && location.searchStr !== "") {
       throw redirect({
-        to: location.search.redirect,
+        to: location.search.app_redirect,
       });
     }
   },

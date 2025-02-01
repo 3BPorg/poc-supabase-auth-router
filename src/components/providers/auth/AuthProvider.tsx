@@ -29,9 +29,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUserState(session);
-    });
+    const updateSessionOnStart = async () => {
+      await supabase.auth.getUser();
+      await supabase.auth.refreshSession();
+      await supabase.auth.getSession().then(({ data: { session } }) => {
+        setUserState(session);
+      });
+    };
+
+    void updateSessionOnStart();
 
     supabase.auth.onAuthStateChange((_event, session) => {
       setUserState(session);

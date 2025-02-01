@@ -28,7 +28,6 @@ function RouteComponent() {
       setMessage(null);
 
       const url = `${window.location.origin}/auth/otp-callback${location.searchStr}`;
-
       const { error } = await supabase.auth.signInWithOtp({
         email,
         options: {
